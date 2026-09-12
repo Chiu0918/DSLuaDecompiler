@@ -1,0 +1,31 @@
+name: Decompile Malenia AI
+
+on:
+  workflow_dispatch:
+
+jobs:
+  decompile:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Setup .NET 9
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+
+      - name: Build DSLuaDecompiler
+        run: dotnet build DSLuaDecompiler/DSLuaDecompiler.csproj -c Release
+
+      - name: Decompile Malenia AI
+        run: dotnet run --project DSLuaDecompiler/DSLuaDecompiler.csproj -c Release --no-build -- 212000_battle.lua -o 212000_battle.dec.lua
+
+      - name: Upload result
+        uses: actions/upload-artifact@v4
+        with:
+          name: Malenia-Decompiled-AI
+          path: 212000_battle.dec.lua
